@@ -10,9 +10,14 @@
 
   outputs = { nixpkgs, home-manager, nixos-hardware, ... }:
   let
-    system = "x86_64-linux";  # ✅ Define system architecture once
+    system = "x86_64-linux";  # Define system architecture once
   in {
-    # ✅ NixOS Configuration
+    # Define nixpkgs settings (Allow Unfree Packages)
+    nixpkgsConfig = {
+      allowUnfree = true;
+    };
+
+    # NixOS Configuration
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = system;
       modules = [
@@ -27,7 +32,7 @@
       ];
     };
 
-    # ✅ Home Manager Configuration (Fixes home-manager switch --flake)
+    # Home Manager Configuration (Fixes home-manager switch --flake)
     homeConfigurations.phil = home-manager.lib.homeManagerConfiguration {
       pkgs = nixpkgs.legacyPackages.${system};
       modules = [ ./home.nix ];
