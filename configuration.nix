@@ -5,25 +5,26 @@
   # 🔹 Import Configurations
   # ==========================
   imports = [
-    ./hardware-configuration.nix
-    ./packages.nix  # Package list in a separate file
+    ./hardware-configuration.nix  # Hardware settings
+    ./packages.nix  # System packages in a separate file
   ];
 
   # ==========================
-  # 🔹 Boot Configuration
+  # 🔹 Boot Configuration (Systemd-Boot)
   # ==========================
-  boot.loader.grub = {
-    enable = true;
-    device = "nodev";  # EFI System
-    efiSupport = true;
-    efiInstallAsRemovable = true;
-    useOSProber = true;
-  };
-  boot.loader.efi.canTouchEfiVariables = false;
-  boot.loader.efi.efiSysMountPoint = "/boot";
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  # ✅ Btrfs Mount Options
+  fileSystems."/".options = [ "compress=zstd" "subvol=@" ];
+  fileSystems."/home".options = [ "compress=zstd" "subvol=@home" ];
+  fileSystems."/nix".options = [ "compress=zstd" "noatime" "subvol=@nix" ];
+  fileSystems."/var/log".options = [ "compress=zstd" "subvol=@log" ];
+  fileSystems."/var/cache".options = [ "compress=zstd" "subvol=@cache" ];
+  fileSystems."/swap".options = [ "subvol=@swap" ];
 
   fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/C371-3D17";
+    device = "/dev/disk/by-uuid/EF3B-9CB0";  # Keep your Git config's boot UUID
     fsType = "vfat";
     options = [ "fmask=0077" "dmask=0077" ];
   };
@@ -32,6 +33,7 @@
   # 🔹 System Settings
   # ==========================
   networking.hostName = "nixos";
+  networking.networkmanager.enable = true; # Enable NetworkManager
   time.timeZone = "Europe/Berlin";
 
   # ✅ Allow proprietary software
@@ -52,17 +54,18 @@
   services.power-profiles-daemon.enable = true;
 
   # ==========================
-  # 🔹 Graphics Optimization
+  # 🔹 Graphics & Touchscreen Support
   # ==========================
   hardware.graphics.enable = true;
   hardware.graphics.extraPackages = with pkgs; [ intel-media-driver vaapiIntel vaapiVdpau ];
 
-  # ==========================
-  # 🔹 Networking & Bluetooth
-  # ==========================
-  networking.networkmanager.enable = true;
+  # ✅ Enable Touchscreen Support
+  services.udev.packages = [ pkgs.iptsd ];
+  systemd.packages = [ pkgs.iptsd ];
 
-  # ✅ Enable Bluetooth
+  # ==========================
+  # 🔹 Bluetooth & Networking
+  # ==========================
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
 
@@ -98,10 +101,6 @@
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
 
-  # ✅ Enable Touchscreen Support
-  services.udev.packages = [ pkgs.iptsd ];
-  systemd.packages = [ pkgs.iptsd ];
-
   # ✅ Enable Touchpad Support (if needed)
   # services.xserver.libinput.enable = true;
 
@@ -130,7 +129,6 @@
     shell = pkgs.zsh;
     packages = with pkgs; [
       kdePackages.kate
-      # thunderbird
     ];
   };
 
@@ -153,5 +151,5 @@
   # ==========================
   # 🔹 System Version (DO NOT CHANGE)
   # ==========================
-  system.stateVersion = "24.11"; # Did you read the comment?
+  system.stateVersion = "24.11";
 }
