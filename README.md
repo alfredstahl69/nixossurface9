@@ -21,7 +21,9 @@ and with this: home-manager switch --flake ~/nixossurface9#phil
 buuuuuut what would make sense would be to add to the first one the --bootloader-install flag, since we havent done that yet. so use this command at first:sudo nixos-rebuild switch --flake ~/nixossurface9#nixos --bootloader-install  
 wether this works or not I have absolutly no fckng clue.  
 but anyways. before that all chatgpt also  says that configuring btrfs would be important. which I dont think so since it fckng kills everything but whatever lets see.  
-also if the rebuild doesnt work, then what would be smart would be to just copy the cloned files into /etc/nixos/ and then do it with the tradtional flake thingy whatever yes. I dont trust chatgpt...
+also if the rebuild doesnt work, then what would be smart would be to just copy the cloned files into /etc/nixos/ and then do it with the tradtional flake thingy whatever yes. I dont trust chatgpt...  
+
+okay update. I did install with btrfs the way that went over the terminal. it worked? kind of? basically doing  a rebuild inside tty1 fixed some problems. now the new commit includes the btrfs fixes, wether it works I dont know.  
 
 
 
