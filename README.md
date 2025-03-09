@@ -12,3 +12,8 @@ then do this: git add .
 then: git commit -m "name"  
 then: git push origin main  
 
+first dont forget to add this to config.nix:   nix.settings.experimental-features = [ "nix-command" "flakes" ];  
+then best to do a sudo nixos-rebuild switch --upgrade  
+now we can do git clone   
+
+
