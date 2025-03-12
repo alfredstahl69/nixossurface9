@@ -2,10 +2,17 @@
 
 {
   environment.systemPackages = with pkgs; [
+    powertop 
+    file lsof psmisc usbutils 
+    libwacom
+    nix-du
+    nix-index
     acpid
-#    tlp
-#    tlpui
-    grub2
+    dbus
+    util-linux
+    btrfs-progs
+    btrfs-assistant
+#    grub2
     vim
     wget
     curl
