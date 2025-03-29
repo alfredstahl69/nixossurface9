@@ -22,6 +22,10 @@
     boot-options-count = 2;
   };
 
+  services.snapper.configs."home" = {
+    SUBVOLUME = "/home";
+  };
+
   services.dbus.enable = true;
   networking = {
     hostName = "nixos";
