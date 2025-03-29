@@ -171,5 +171,13 @@ nixos-generate-config --root /mnt
 6️⃣ Run `sudo nixos-rebuild switch --flake /etc/nixos#nixos --bootloader-install`.
 7️⃣ If issues arise, check UUIDs, rebuild from **TTY1**, or enter via **Live USB**.
 
-This guide ensures a reproducible and structured installation process. 🚀
+This guide ensures a reproducible and structured installation process. 🚀  
+
+  zu Beginn sollte folgendes in config.nix eingefügt werden:   services.snapper.configs."home" = {
+  SUBVOLUME = "/home";
+};
+  
+  bezüglich snapshots läuft das so ab:   sudo btrfs subvolume create /home/.snapshots/   then:   sudo snapper -c home create -d "insert name"  
+  now we have a snapshot. to restore a specific snapshots you should be able to do this:   sudo snapper -c home rollback "n"  
+
 
