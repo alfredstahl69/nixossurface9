@@ -2,6 +2,7 @@
 
 {
   environment.systemPackages = with pkgs; [
+#    snapper
     powertop 
     file lsof psmisc usbutils 
     libwacom
