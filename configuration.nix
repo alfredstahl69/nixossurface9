@@ -26,6 +26,10 @@
     SUBVOLUME = "/home";
   };
 
+  services.snapper.configs."root" = {
+    SUBVOLUME = "/";
+  };
+
   services.dbus.enable = true;
   networking = {
     hostName = "nixos";
