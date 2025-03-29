@@ -178,6 +178,6 @@ This guide ensures a reproducible and structured installation process. 🚀
 };
   
   bezüglich snapshots läuft das so ab:   sudo btrfs subvolume create /home/.snapshots/   then:   sudo snapper -c home create -d "insert name"  
-  now we have a snapshot. to restore a specific snapshots you should be able to do this:   sudo snapper -c home rollback "n"  
+  now we have a snapshot. to restore a specific snapshots you should be able to do this:   sudo snapper -c home rollback "n"  nevermiiiiiiiiinnnnnddd alles ungültig. nutz einfach btrfs assistant und es hat sich alles gegessen.
 
 
