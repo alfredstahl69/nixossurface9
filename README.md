@@ -20,8 +20,8 @@ once copied rebuilding should be made like this: sudo nixos-rebuild switch --fla
 and with this: home-manager switch --flake ~/nixossurface9#phil  
 buuuuuut what would make sense would be to add to the first one the --bootloader-install flag, since we havent done that yet. so use this command at first:sudo nixos-rebuild switch --flake ~/nixossurface9#nixos --bootloader-install  
 wether this works or not I have absolutly no fckng clue.  
-but anyways. before that all chatgpt also  says that configuring btrfs would be important. which I dont think so since it fckng kills everything but whatever lets see.  
-also if the rebuild doesnt work, then what would be smart would be to just copy the cloned files into /etc/nixos/ and then do it with the tradtional flake thingy whatever yes. I dont trust chatgpt...  
+but anyways. 
+also if the rebuild doesnt work, then what would be smart would be to just copy the cloned files into /etc/nixos/ and then do it with the tradtional flake thingy whatever yes. 
 
 okay update. I did install with btrfs the way that went over the terminal. it worked? kind of? basically doing  a rebuild inside tty1 fixed some problems. now the new commit includes the btrfs fixes, wether it works I dont know.  
 
@@ -177,7 +177,58 @@ okay so booting into it will likely not work. here is why: well I dont know, but
 
 right also. the password can be set with:   passwd phil. cool!  
 
-rebuilding from the cloned commit *should* be fine, though that requires testing I guess. lets see if something breaks...  
+rebuilding from the cloned commit *should* be fine, though that requires testing I guess. lets see if something breaks...                                      
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+right this all is kind of not important anymore. pretty sure I figured something new out. so the deal is we use the command line to install it all. first would be to format the partition with gparted to btrfs. then the plan would be to do this:     mount -o compress=zstd /dev/sdc3 /mnt    after that come this:     btrfs subvolume create /mnt/root
+btrfs subvolume create /mnt/home
+btrfs subvolume create /mnt/nix
+btrfs subvolume create /mnt/log
+btrfs subvolume create /mnt/cache    
+and then we will also do this:     btrfs subvolume create /mnt/snapshots    and then unmount:     umount /mnt    
+now this: Now, mount the root subvolume first:
+
+mount -o compress=zstd,subvol=root /dev/sdc3 /mnt
+
+Then create necessary directories and mount the rest:
+
+mkdir -p /mnt/{home,nix,var/log,var/cache}
+mount -o compress=zstd,subvol=home /dev/sdc3 /mnt/home
+mount -o compress=zstd,subvol=nix /dev/sdc3 /mnt/nix
+mount -o compress=zstd,subvol=log /dev/sdc3 /mnt/var/log
+mount -o compress=zstd,subvol=cache /dev/sdc3 /mnt/var/cache
+
+(If you made a snapshots subvolume)
+
+mkdir -p /mnt/.snapshots
+mount -o compress=zstd,subvol=snapshots /dev/sdc3 /mnt/.snapshots
+
+    and obviously this with prob on the surface being nvme:    mkdir -p /mnt/boot
+mount /dev/sdXn /mnt/boot  # Replace with actual boot partition (e.g., /dev/sdc1)
+
+    then the plan is to do this:    nixos-generate-config --root /mnt    and then to copy my barebojne config.nix inside there, or rather to overwrite the created config.nix. and obviously check the hardwareconfig wether everything is inside there.     
+    if everything makes sense then do this:     nixos-install    
+    now it all should have worked, if not... well thats bad. anyway.    
+
+    now the next plan is, after booting if stuff doest work use tty1 and do a rebuild, then it shhould work.     
+    then log in, open the config.nix and enable experimental features and install git( actually I maybe should add that into my barebone config). anyway.     
+    then please copy over the github stuff with     git clone https://github.com/alfredstahl69/nixossurface9    then obviously put in the password and stuff.    after that you may copy over the stuff from within the githuib clojned directory to /etc/nixos and please do so with:      sudo cp -r     
+    now after that you may run:     sudo nixos-rebuild switch --flake /etc/nixos#nixos    
+    and then it should work. I hope. you may also, after that, run:    home-manager switch --flake /etc/nixos#phil    
+    and that should be it. I hope.
