@@ -10,27 +10,15 @@
   ];
 
   # ==========================
-  # 🔹 Boot Configuration (Systemd-Boot)
+  # 🔹 Boot Configuration (GRUB)
   # ==========================
-  boot.loader.systemd-boot = {
-    enable = true;
-    configurationLimit = 10;  # Keep last 10 bootloader entries
-  };
-  boot.loader.efi.canTouchEfiVariables = true;
-
-  # Btrfs Mount Options
-  fileSystems."/".options = [ "compress=zstd" "subvol=@" ];
-  fileSystems."/home".options = [ "compress=zstd" "subvol=@home" ];
-  fileSystems."/nix".options = [ "compress=zstd" "noatime" "subvol=@nix" ];
-  fileSystems."/var/log".options = [ "compress=zstd" "subvol=@log" ];
-  fileSystems."/var/cache".options = [ "compress=zstd" "subvol=@cache" ];
-  fileSystems."/swap".options = [ "subvol=@swap" ];
-
-  fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/EF3B-9CB0";
-    fsType = "vfat";
-    options = [ "fmask=0077" "dmask=0077" ];
-  };
+  boot.loader.systemd-boot.enable = false;
+  boot.loader.grub.enable = true;
+  boot.loader.grub.efiSupport = true;
+  boot.loader.grub.efiInstallAsRemovable = true;
+  boot.loader.efi.canTouchEfiVariables = false;
+  boot.loader.grub.devices = [ "nodev" ];
+  boot.loader.grub.useOSProber = true;
 
   # ==========================
   # 🔹 System Settings
