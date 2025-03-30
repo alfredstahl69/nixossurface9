@@ -1,6 +1,4 @@
-
 { config, pkgs, ... }:
-
 {
   imports = [
     ./hardware-configuration.nix
@@ -111,4 +109,5 @@
   services.acpid.enable = true;
 
   system.stateVersion = "24.11";
+
 }

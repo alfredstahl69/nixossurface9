@@ -2,7 +2,9 @@
 
 {
   environment.systemPackages = with pkgs; [
-#    snapper
+    kdePackages.plasma-browser-integration
+    firedragon
+    libreoffice
     powertop 
     file lsof psmisc usbutils 
     libwacom
