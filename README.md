@@ -53,7 +53,7 @@ btrfs subvolume create /mnt/home
 btrfs subvolume create /mnt/nix
 btrfs subvolume create /mnt/log
 btrfs subvolume create /mnt/cache
-btrfs subvolume create /mnt/snapshots
+btrfs subvolume create /mnt/.snapshots
 umount /mnt
 ```
 
@@ -66,8 +66,8 @@ mount -o compress=zstd,subvol=home /dev/sdX2 /mnt/home
 mount -o compress=zstd,subvol=nix /dev/sdX2 /mnt/nix
 mount -o compress=zstd,subvol=log /dev/sdX2 /mnt/var/log
 mount -o compress=zstd,subvol=cache /dev/sdX2 /mnt/var/cache
-mount -o compress=zstd,subvol=snapshots /dev/sdX2 /mnt/.snapshots
-mount /dev/sdX1 /mnt/boot  # Replace with actual boot partition
+mount -o compress=zstd,subvol=.snapshots /dev/sdX2 /mnt/.snapshots
+mount /dev/sdX1 /mnt/boot/efi  # Replace with actual boot partition
 ```
 
 ### Generating Configuration
