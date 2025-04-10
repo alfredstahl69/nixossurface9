@@ -8,8 +8,8 @@
   boot.loader.systemd-boot.enable = false;
   boot.loader.grub.enable = true;
   boot.loader.grub.efiSupport = true;
-  boot.loader.grub.efiInstallAsRemovable = true;
-  boot.loader.efi.canTouchEfiVariables = false;
+  boot.loader.grub.efiInstallAsRemovable = false;
+  boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.grub.devices = [ "nodev" ];
   boot.loader.grub.useOSProber = false;
 
@@ -19,6 +19,10 @@
     background = "background_options/1.20 - [Trails & Tales].png";
     boot-options-count = 2;
   };
+
+  boot.loader.efi.efiSysMountPoint = "/boot/efi/";
+  boot.loader.grub.configurationName = "NixOS";
+  boot.loader.grub.efiBootloaderId = "NixOS";
 
   services.snapper.configs."home" = {
     SUBVOLUME = "/home";
