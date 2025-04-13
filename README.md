@@ -223,6 +223,7 @@ Make sure your theme files are accessible and paths match correctly.
 6. Add Minegrub for some ✨ extra flavor
 
 wenn nun noch mehr grub einträge rein sollen, dann ganz einfach folgenes in config.nix einfügen, dabei aber halt auf uuids achten und natürlich bei minegrub die anzahl der einträge anpassen.   
+
      # Custom GRUB-Einträge hinzufügen
   boot.loader.grub.extraEntries = ''
     # Boot ins UEFI-Firmware-Setup (BIOS)
@@ -248,3 +249,4 @@ wenn nun noch mehr grub einträge rein sollen, dann ganz einfach folgenes in con
         chainloader /EFI/Garuda/grubx64.efi
     }
   '';
+  
