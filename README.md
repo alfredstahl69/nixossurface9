@@ -225,7 +225,7 @@ Make sure your theme files are accessible and paths match correctly.
 wenn nun noch mehr grub einträge rein sollen, dann ganz einfach folgenes in config.nix einfügen, dabei aber halt auf uuids achten und natürlich bei minegrub die anzahl der einträge anpassen.   
 
      # Custom GRUB-Einträge hinzufügen
-  boot.loader.grub.extraEntries = ''
+      boot.loader.grub.extraEntries = ''
     # Boot ins UEFI-Firmware-Setup (BIOS)
     menuentry "UEFI Firmware Settings" {
         fwsetup
@@ -248,5 +248,5 @@ wenn nun noch mehr grub einträge rein sollen, dann ganz einfach folgenes in con
         search --fs-uuid --set=root 5D48-3DE2  # UUID der Garuda-ESP
         chainloader /EFI/Garuda/grubx64.efi
     }
-  '';
+      '';
   
