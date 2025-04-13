@@ -178,6 +178,25 @@ This guide ensures a reproducible and structured installation process. 🚀
 };
   
   bezüglich snapshots läuft das so ab:   sudo btrfs subvolume create /home/.snapshots/   then:   sudo snapper -c home create -d "insert name"  
-  now we have a snapshot. to restore a specific snapshots you should be able to do this:   sudo snapper -c home rollback "n"  nevermiiiiiiiiinnnnnddd alles ungültig. nutz einfach btrfs assistant und es hat sich alles gegessen.
+  now we have a snapshot. to restore a specific snapshots you should be able to do this:   sudo snapper -c home rollback "n"  nevermiiiiiiiiinnnnnddd alles ungültig. nutz einfach btrfs assistant und es hat sich alles gegessen.  
+
+
+
+    # 1. UUID der NixOS-ESP finden
+lsblk -f
+
+# 2. GRUB EFI-Dateipfad von NixOS finden
+sudo efibootmgr -v | grep NixOS
+
+# 3. In /etc/grub.d/40_custom einfügen:
+menuentry "NixOS (chainload)" {
+    insmod part_gpt
+    insmod fat
+    search --fs-uuid --set=root <UUID>
+    chainloader /EFI/<Pfad-zur-GRUB-EFI>.efi
+}
+
+# 4. GRUB updaten
+sudo update-grub
 
 
