@@ -22,7 +22,7 @@
 
   boot.loader.efi.efiSysMountPoint = "/boot/efi/";
   boot.loader.grub.configurationName = "NixOS";
-  boot.loader.grub.efiBootloaderId = "NixOS";
+  #boot.loader.grub.efiBootloaderId = "NixOS";
 
   services.snapper.configs."home" = {
     SUBVOLUME = "/home";
