@@ -222,3 +222,29 @@ Make sure your theme files are accessible and paths match correctly.
 5. Chainload via GRUB if needed  
 6. Add Minegrub for some ✨ extra flavor
 
+wenn nun noch mehr grub einträge rein sollen, dann ganz einfach folgenes in config.nix einfügen, dabei aber halt auf uuids achten und natürlich bei minegrub die anzahl der einträge anpassen.   
+     # Custom GRUB-Einträge hinzufügen
+  boot.loader.grub.extraEntries = ''
+    # Boot ins UEFI-Firmware-Setup (BIOS)
+    menuentry "UEFI Firmware Settings" {
+        fwsetup
+    }
+
+    # Reboot direkt aus GRUB
+    menuentry "Reboot" {
+        reboot
+    }
+
+    # Shutdown direkt aus GRUB
+    menuentry "Shutdown" {
+        halt
+    }
+
+    # Garuda Linux GRUB-Chainloading
+    menuentry "Boot Garuda" {
+        insmod part_gpt
+        insmod fat
+        search --fs-uuid --set=root 5D48-3DE2  # UUID der Garuda-ESP
+        chainloader /EFI/Garuda/grubx64.efi
+    }
+  '';
