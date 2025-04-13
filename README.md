@@ -1,32 +1,27 @@
-# Installing NixOS on a Surface Pro 9
+# 🚀 Installing NixOS on a Surface Pro 9
 
-This guide documents the process of installing NixOS on a Surface Pro 9 using Btrfs subvolumes. The steps include partitioning, mounting, installing, and setting up a reproducible configuration with Git. It also provides troubleshooting tips.
+This guide documents the process of installing NixOS on a Surface Pro 9 using Btrfs subvolumes and a reproducible Git-based setup. It includes partitioning, installation, post-setup, and even how to make your GRUB menu look awesome with Minegrub 🟦🟨
 
 ---
 
-## 1️⃣ Setting up Git on a New Machine
+## 1️⃣ Set up Git on a New Machine
 
-```sh
+```bash
+# Configure your Git user details
 git config --global user.name "alfred.stahl69"
 git config --global user.email "alfred.stahl69@gmail.com"
-```
 
-To clone the repository and start working with it:
-
-```sh
+# Clone your configuration repository
 git clone https://github.com/alfredstahl69/nixossurface9.git
 cd nixossurface9
-```
 
-To copy the files:
-
-```sh
+# Copy the configuration into place
 cp -r * /etc/nixos/
 ```
 
-Then commit and push changes:
+To commit and push changes later:
 
-```sh
+```bash
 git add .
 git commit -m "commit message"
 git push origin main
@@ -34,118 +29,111 @@ git push origin main
 
 ---
 
-## 2️⃣ Preparing the System for NixOS Installation
+## 2️⃣ Preparing the System
 
-### Formatting the Partition
+### Format the Partition
 
-Use **GParted** to format the desired partition as **Btrfs**, or do it manually:
+Use GParted or do it manually:
 
-```sh
-mkfs.btrfs /dev/sdX2  # Replace with actual partition
+```bash
+mkfs.btrfs /dev/nvmeXn1pY  # Replace with your actual partition
 ```
 
-### Creating Btrfs Subvolumes
+### Create Btrfs Subvolumes
 
-```sh
-mount -o compress=zstd /dev/sdX2 /mnt
-btrfs subvolume create /mnt/root
-btrfs subvolume create /mnt/home
-btrfs subvolume create /mnt/nix
-btrfs subvolume create /mnt/log
-btrfs subvolume create /mnt/cache
-btrfs subvolume create /mnt/.snapshots
+```bash
+mount -o compress=zstd /dev/nvmeXn1pY /mnt
+btrfs subvolume create /mnt/root      # Root filesystem
+btrfs subvolume create /mnt/home      # User home directories
+btrfs subvolume create /mnt/nix       # Nix store
+btrfs subvolume create /mnt/log       # Log files
+btrfs subvolume create /mnt/cache     # Cache
+btrfs subvolume create /mnt/.snapshots # For future snapshots
 umount /mnt
 ```
 
-### Mounting Subvolumes
+### Mount Subvolumes
 
-```sh
-mount -o compress=zstd,subvol=root /dev/sdX2 /mnt
+```bash
+mount -o compress=zstd,subvol=root /dev/nvmeXn1pY /mnt
 mkdir -p /mnt/{home,nix,var/log,var/cache,.snapshots,boot}
-mount -o compress=zstd,subvol=home /dev/sdX2 /mnt/home
-mount -o compress=zstd,subvol=nix /dev/sdX2 /mnt/nix
-mount -o compress=zstd,subvol=log /dev/sdX2 /mnt/var/log
-mount -o compress=zstd,subvol=cache /dev/sdX2 /mnt/var/cache
-mount -o compress=zstd,subvol=.snapshots /dev/sdX2 /mnt/.snapshots
-mount /dev/sdX1 /mnt/boot/efi  # Replace with actual boot partition
-```
-
-### Generating Configuration
-
-```sh
-nixos-generate-config --root /mnt
-```
-
-### Installing NixOS
-
-```sh
-nixos-install
-reboot
+mount -o compress=zstd,subvol=home /dev/nvmeXn1pY /mnt/home
+mount -o compress=zstd,subvol=nix /dev/nvmeXn1pY /mnt/nix
+mount -o compress=zstd,subvol=log /dev/nvmeXn1pY /mnt/var/log
+mount -o compress=zstd,subvol=cache /dev/nvmeXn1pY /mnt/var/cache
+mount -o compress=zstd,subvol=.snapshots /dev/nvmeXn1pY /mnt/.snapshots
+mount /dev/nvmeXn1p1 /mnt/boot/efi  # Mount EFI partition
 ```
 
 ---
 
-## 3️⃣ Post-Installation Setup
+## 3️⃣ Installation & Configuration
 
-If booting into the system fails, switch to **TTY1** with `Ctrl + Alt + F1` and try a rebuild:
+```bash
+# Generate initial configuration
+nixos-generate-config --root /mnt
 
-```sh
+# Install NixOS
+nixos-install
+reboot
+```
+
+### After First Boot
+
+```bash
+# Make sure your system is up-to-date
 sudo nixos-rebuild switch --upgrade
 ```
 
-Enable experimental features by adding this to `/etc/nixos/configuration.nix`:
+Enable flakes support:
 
 ```nix
 nix.settings.experimental-features = [ "nix-command" "flakes" ];
 ```
 
-Install Git if necessary:
+Install Git (if missing):
 
-```sh
+```bash
 sudo nix-env -iA nixpkgs.git
 ```
 
-Clone the GitHub repository and copy the config:
+Reclone repo & rebuild:
 
-```sh
+```bash
 git clone https://github.com/alfredstahl69/nixossurface9
 sudo cp -r nixossurface9/* /etc/nixos/
-```
 
-Rebuild with:
-
-```sh
 sudo nixos-rebuild switch --flake /etc/nixos#nixos --bootloader-install
 home-manager switch --flake /etc/nixos#phil
 ```
 
-If something is broken, check UUIDs with:
+Check UUIDs if needed:
 
-```sh
+```bash
 lsblk -f
 ```
-
-Modify `/etc/nixos/hardware-configuration.nix` accordingly.
 
 ---
 
 ## 4️⃣ Troubleshooting
 
-- If the system fails to boot, use **TTY1** (`Ctrl + Alt + F1`) and rebuild.
-- If necessary, enter the system from a **Live USB**:
+### Live USB Recovery
 
-```sh
-mount -o subvol=root /dev/sdX2 /mnt
-mount -o subvol=home /dev/sdX2 /mnt/home
-mount -o subvol=nix /dev/sdX2 /mnt/nix
-mount -o subvol=log /dev/sdX2 /mnt/var/log
-mount -o subvol=cache /dev/sdX2 /mnt/var/cache
-mount /dev/sdX1 /mnt/boot
+```bash
+# Mount root and other subvolumes
+mount -o subvol=root /dev/nvmeXn1pY /mnt
+mount -o subvol=home /dev/nvmeXn1pY /mnt/home
+mount -o subvol=nix /dev/nvmeXn1pY /mnt/nix
+mount -o subvol=log /dev/nvmeXn1pY /mnt/var/log
+mount -o subvol=cache /dev/nvmeXn1pY /mnt/var/cache
+mount /dev/nvmeXn1p1 /mnt/boot
+
+# Enter system
 nixos-enter --root /mnt
-passwd phil  # Set password
+passwd phil  # Reset user password if needed
 ```
 
-- If the display manager isn’t working, enable KDE Plasma:
+### KDE Plasma Display Manager
 
 ```nix
 services.xserver.enable = true;
@@ -153,50 +141,84 @@ services.displayManager.sddm.enable = true;
 services.desktopManager.plasma6.enable = true;
 ```
 
-- Regenerate config if needed:
+---
 
-```sh
-nixos-generate-config --root /mnt
+## 5️⃣ Snapshots
+
+Use **Btrfs Assistant** for easy snapshot management — it’s much more intuitive than Snapper.
+
+---
+
+## 6️⃣ GRUB Chainloading (Multi-Distro Boot)
+
+1. Find NixOS ESP UUID:
+
+```bash
+lsblk -f
 ```
+
+2. Find NixOS EFI path:
+
+```bash
+sudo efibootmgr -v | grep NixOS
+```
+
+3. Add to `/etc/grub.d/40_custom` on another system:
+
+```bash
+menuentry "NixOS (chainload)" {
+    insmod part_gpt
+    insmod fat
+    search --fs-uuid <UUID> --set=root
+    chainloader /EFI/NIXOS-BOOT-EFI-/GRUBX64.EFI
+}
+```
+
+4. Update GRUB:
+
+```bash
+sudo update-grub
+```
+
+---
+
+## 7️⃣ Bonus: 🟨 Minegrub Theme
+
+Give your GRUB a Minecraft-inspired twist!
+
+### Flake Input:
+
+```nix
+minegrub-theme.url = "github:Lxtharia/minegrub-theme";
+```
+
+### In Modules:
+
+```nix
+minegrub-theme.nixosModules.default
+```
+
+### In `configuration.nix`:
+
+```nix
+boot.loader.grub.minegrub-theme = {
+  enable = true;
+  splash = "100% Flakes!";
+  background = "background_options/1.20 - [Trails & Tales].png";
+  boot-options-count = 2;
+};
+```
+
+Make sure your theme files are accessible and paths match correctly.
 
 ---
 
 ## TL;DR
 
-1️⃣ Boot into a **Live USB** and format the disk.
-2️⃣ Create and mount **Btrfs subvolumes**.
-3️⃣ Run `nixos-generate-config --root /mnt` and install.
-4️⃣ After reboot, enable flakes, install Git, clone your repo.
-5️⃣ Copy the repo contents to `/etc/nixos/`.
-6️⃣ Run `sudo nixos-rebuild switch --flake /etc/nixos#nixos --bootloader-install`.
-7️⃣ If issues arise, check UUIDs, rebuild from **TTY1**, or enter via **Live USB**.
-
-This guide ensures a reproducible and structured installation process. 🚀  
-
-  zu Beginn sollte folgendes in config.nix eingefügt werden:   services.snapper.configs."home" = {
-  SUBVOLUME = "/home";
-};
-  
-  bezüglich snapshots läuft das so ab:   sudo btrfs subvolume create /home/.snapshots/   then:   sudo snapper -c home create -d "insert name"  
-  now we have a snapshot. to restore a specific snapshots you should be able to do this:   sudo snapper -c home rollback "n"  nevermiiiiiiiiinnnnnddd alles ungültig. nutz einfach btrfs assistant und es hat sich alles gegessen.  
-
-
-
-    # 1. UUID der NixOS-ESP finden
-lsblk -f
-
-# 2. GRUB EFI-Dateipfad von NixOS finden
-sudo efibootmgr -v | grep NixOS
-
-# 3. In /etc/grub.d/40_custom einfügen:
-menuentry "NixOS (chainload)" {
-    insmod part_gpt
-    insmod fat
-    search --fs-uuid --set=root <UUID>
-    chainloader /EFI/<Pfad-zur-GRUB-EFI>.efi
-}
-
-# 4. GRUB updaten
-sudo update-grub
-
+1. Boot Live USB, format & mount Btrfs subvolumes  
+2. Generate config & install  
+3. Enable flakes & Git, clone repo  
+4. Copy configs & rebuild with `--flake`  
+5. Chainload via GRUB if needed  
+6. Add Minegrub for some ✨ extra flavor
 
