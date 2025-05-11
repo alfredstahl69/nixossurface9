@@ -1,6 +1,6 @@
 # 🚀 Installing NixOS on a Surface Pro 9
 
-This guide documents the process of installing NixOS on a Surface Pro 9 using Btrfs subvolumes and a reproducible Git-based setup. It includes partitioning, installation, post-setup, and even how to make your GRUB menu look awesome with Minegrub 🟦🟨
+This guide documents the process of installing NixOS on a Surface Pro 9 using Btrfs subvolumes, a swapfile for hibernation, and a reproducible Git-based setup. It includes partitioning, installation, swap setup, post-setup, and even how to make your GRUB menu look awesome with Minegrub 🟦🟨
 
 ---
 
@@ -16,7 +16,7 @@ git clone https://github.com/alfredstahl69/nixossurface9.git
 cd nixossurface9
 
 # Copy the configuration into place
-cp -r * /etc/nixos/
+sudo cp -r * /etc/nixos/
 ```
 
 To commit and push changes later:
@@ -42,56 +42,116 @@ mkfs.btrfs /dev/nvmeXn1pY  # Replace with your actual partition
 ### Create Btrfs Subvolumes
 
 ```bash
+# Temporarily mount root partition
 mount -o compress=zstd /dev/nvmeXn1pY /mnt
-btrfs subvolume create /mnt/root      # Root filesystem
-btrfs subvolume create /mnt/home      # User home directories
-btrfs subvolume create /mnt/nix       # Nix store
-btrfs subvolume create /mnt/log       # Log files
-btrfs subvolume create /mnt/cache     # Cache
-btrfs subvolume create /mnt/.snapshots # For future snapshots
+
+# Create subvolumes
+btrfs subvolume create /mnt/root       # Root filesystem
+btrfs subvolume create /mnt/home       # Home directories
+btrfs subvolume create /mnt/nix        # Nix store
+btrfs subvolume create /mnt/log        # Log files
+btrfs subvolume create /mnt/cache      # Cache
+btrfs subvolume create /mnt/.snapshots # Snapshots
+btrfs subvolume create /mnt/swap       # Swap subvolume (for swapfile)
+
+# Unmount temporarily
 umount /mnt
 ```
 
 ### Mount Subvolumes
 
 ```bash
+# Mount root and other subvolumes
 mount -o compress=zstd,subvol=root /dev/nvmeXn1pY /mnt
-mkdir -p /mnt/{home,nix,var/log,var/cache,.snapshots,boot}
-mount -o compress=zstd,subvol=home /dev/nvmeXn1pY /mnt/home
-mount -o compress=zstd,subvol=nix /dev/nvmeXn1pY /mnt/nix
-mount -o compress=zstd,subvol=log /dev/nvmeXn1pY /mnt/var/log
-mount -o compress=zstd,subvol=cache /dev/nvmeXn1pY /mnt/var/cache
+mkdir -p /mnt/{home,nix,var/log,var/cache,.snapshots,swap,boot}
+
+mount -o compress=zstd,subvol=home       /dev/nvmeXn1pY /mnt/home
+mount -o compress=zstd,subvol=nix        /dev/nvmeXn1pY /mnt/nix
+mount -o compress=zstd,subvol=log        /dev/nvmeXn1pY /mnt/var/log
+mount -o compress=zstd,subvol=cache      /dev/nvmeXn1pY /mnt/var/cache
 mount -o compress=zstd,subvol=.snapshots /dev/nvmeXn1pY /mnt/.snapshots
-mount /dev/nvmeXn1p1 /mnt/boot/efi  # Mount EFI partition
+
+# Mount swap subvolume WITHOUT CoW
+tmp_dir=/mnt/swap
+mount -o subvol=swap,nodatacow,compress=no /dev/nvmeXn1pY $tmp_dir
+
+# Mount EFI partition
+mount /dev/nvmeXn1p1 /mnt/boot/efi
 ```
 
 ---
 
-## 3️⃣ Installation & Configuration
+## 3️⃣ Initial Installation & Swapfile Setup
 
 ```bash
-# Generate initial configuration
-nixos-generate-config --root /mnt
+# Generate NixOS configuration files\ nixos-generate-config --root /mnt
+```
 
-# Install NixOS
-nixos-install
+> **Note**: Do **not** run `nixos-install` yet; first set up the swapfile.
+
+```bash
+# Create the swapfile (12 GiB) using Btrfs tool
+cd /mnt/swap
+btrfs filesystem mkswapfile --size 12G --uuid clear swapfile
+chmod 600 swapfile
+
+# Test activating swap
+swapon swapfile
+swapon --show  # Should display ~12G swap
+swapoff swapfile
+```
+
+---
+
+## 4️⃣ Configure Swap in `configuration.nix`
+
+Edit `/mnt/etc/nixos/configuration.nix` (or your flake-based config) and add:
+
+```nix
+{ config, pkgs, ... }:
+{
+  # Swapfile definition
+  swapDevices = [
+    {
+      device = "/swap/swapfile";  # Path inside the mount
+      size   = 12288;              # Size in MiB (12 GiB)
+    }
+  ];
+
+  # Hibernate (Suspend-to-Disk) support
+  boot.kernelParams = [
+    "resume=/swap/swapfile"
+    # Replace OFFSET with the value found via filefrag:
+    # e.g. filefrag -v /swap/swapfile | awk '$1=="0:"{print $4}'
+    "resume_offset=OFFSET"
+  ];
+}
+```
+
+After saving, run:
+
+```bash
+sudo nixos-install
 reboot
 ```
 
-### After First Boot
+---
+
+## 5️⃣ Post-Installation
 
 ```bash
-# Make sure your system is up-to-date
+# Ensure system is up-to-date
 sudo nixos-rebuild switch --upgrade
 ```
 
-Enable flakes support:
+Enable flakes support if not yet enabled:
 
 ```nix
+# In /etc/nixos/configuration.nix or flake inputs
 nix.settings.experimental-features = [ "nix-command" "flakes" ];
 ```
 
-Install Git (if missing):
+Install Git if missing:
 
 ```bash
 sudo nix-env -iA nixpkgs.git
@@ -107,145 +167,68 @@ sudo nixos-rebuild switch --flake /etc/nixos#nixos --bootloader-install
 home-manager switch --flake /etc/nixos#phil
 ```
 
-Check UUIDs if needed:
-
-```bash
-lsblk -f
-```
-
 ---
 
-## 4️⃣ Troubleshooting
+## 6️⃣ GRUB & Minegrub Theme
 
-### Live USB Recovery
-
-```bash
-# Mount root and other subvolumes
-mount -o subvol=root /dev/nvmeXn1pY /mnt
-mount -o subvol=home /dev/nvmeXn1pY /mnt/home
-mount -o subvol=nix /dev/nvmeXn1pY /mnt/nix
-mount -o subvol=log /dev/nvmeXn1pY /mnt/var/log
-mount -o subvol=cache /dev/nvmeXn1pY /mnt/var/cache
-mount /dev/nvmeXn1p1 /mnt/boot
-
-# Enter system
-nixos-enter --root /mnt
-passwd phil  # Reset user password if needed
-```
-
-### KDE Plasma Display Manager
-
-```nix
-services.xserver.enable = true;
-services.displayManager.sddm.enable = true;
-services.desktopManager.plasma6.enable = true;
-```
-
----
-
-## 5️⃣ Snapshots
-
-Use **Btrfs Assistant** for easy snapshot management — it’s much more intuitive than Snapper.
-
----
-
-## 6️⃣ GRUB Chainloading (Multi-Distro Boot)
-
-1. Find NixOS ESP UUID:
-
-```bash
-lsblk -f
-```
-
-2. Find NixOS EFI path:
-
-```bash
-sudo efibootmgr -v | grep NixOS
-```
-
-3. Add to `/etc/grub.d/40_custom` on another system:
-
-```bash
-menuentry "NixOS (chainload)" {
-    insmod part_gpt
-    insmod fat
-    search --fs-uuid <UUID> --set=root
-    chainloader /EFI/NIXOS-BOOT-EFI-/GRUBX64.EFI
-}
-```
-
-4. Update GRUB:
-
-```bash
-sudo update-grub
-```
-
----
-
-## 7️⃣ Bonus: 🟨 Minegrub Theme
-
-Give your GRUB a Minecraft-inspired twist!
-
-### Flake Input:
+### Flake Inputs for Minegrub
 
 ```nix
 minegrub-theme.url = "github:Lxtharia/minegrub-theme";
 ```
 
-### In Modules:
+### Include Modules
 
 ```nix
 minegrub-theme.nixosModules.default
 ```
 
-### In `configuration.nix`:
+### GRUB Configuration in `configuration.nix`
 
 ```nix
-boot.loader.grub.minegrub-theme = {
+boot.loader.grub = {
   enable = true;
-  splash = "100% Flakes!";
-  background = "background_options/1.20 - [Trails & Tales].png";
-  boot-options-count = 2;
+  version = 2;
+  device = "/dev/nvmeXn1";
+  minegrub-theme = {
+    enable = true;
+    splash = "100% Flakes!";
+    background = "background_options/1.20 - [Trails & Tales].png";
+    boot-options-count = 2;
+  };
+  extraEntries = ''
+    menuentry "UEFI Firmware Settings" { fwsetup }
+    menuentry "Reboot" { reboot }
+    menuentry "Shutdown" { halt }
+    menuentry "Boot Garuda" {
+      insmod part_gpt
+      insmod fat
+      search --fs-uuid 5D48-3DE2 --set=root
+      chainloader /EFI/Garuda/grubx64.efi
+    }
+  '';
 };
 ```
 
-Make sure your theme files are accessible and paths match correctly.
+---
+
+## 7️⃣ Troubleshooting & Recovery
+
+Follow live USB recovery steps and mount as above. Use `nixos-enter` if needed.
+
+---
+
+## 8️⃣ Snapshots & Maintenance
+
+Use **Btrfs Assistant** or `btrfs` CLI for snapshots under `/mnt/.snapshots`.
 
 ---
 
 ## TL;DR
 
-1. Boot Live USB, format & mount Btrfs subvolumes  
-2. Generate config & install  
-3. Enable flakes & Git, clone repo  
-4. Copy configs & rebuild with `--flake`  
-5. Chainload via GRUB if needed  
-6. Add Minegrub for some ✨ extra flavor
-
-wenn nun noch mehr grub einträge rein sollen, dann ganz einfach folgenes in config.nix einfügen, dabei aber halt auf uuids achten und natürlich bei minegrub die anzahl der einträge anpassen.   
-
-    # Custom GRUB-Einträge hinzufügen
-    boot.loader.grub.extraEntries = ''
-        # Boot ins UEFI-Firmware-Setup (BIOS)
-        menuentry "UEFI Firmware Settings" {
-            fwsetup
-        }
-
-        # Reboot direkt aus GRUB
-        menuentry "Reboot" {
-            reboot
-        }
-
-        # Shutdown direkt aus GRUB
-        menuentry "Shutdown" {
-            halt
-        }
-
-        # Garuda Linux GRUB-Chainloading
-        menuentry "Boot Garuda" {
-            insmod part_gpt
-            insmod fat
-            search --fs-uuid --set=root 5D48-3DE2  # UUID der Garuda-ESP
-            chainloader /EFI/Garuda/grubx64.efi
-        }
-     '';  
+1. Format & mount Btrfs subvolumes (including `swap` subvolume).
+2. Generate config but **delay** `nixos-install` until swapfile is in place.
+3. Create 12 GiB swapfile in `swap` subvolume and test.
+4. Add `swapDevices` and `boot.kernelParams` to `configuration.nix`.
+5. Run `nixos-install` and enjoy Hibernate on your Surface Pro 9.
+6. Add Minegrub for a fancy GRUB theme.
