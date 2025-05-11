@@ -112,6 +112,20 @@
 
   services.acpid.enable = true;
 
+  # Swapfile definition for 12 GiB (Added for Hibernate) <<< MARKED CHANGE >>>
+  swapDevices = [
+    {
+      device = "/swap/swapfile";  # adjust if your swap subvolume mountpoint differs <<< REVIEW UUID/Path >>>
+      size   = 12288;              # Size in MiB (12 GiB)
+    }
+  ];
+
+  # Hibernate (Suspend-to-Disk) support <<< MARKED CHANGE >>>
+  boot.kernelParams = [
+    "resume=/swap/swapfile";     # adjust path if needed <<< REVIEW PATH >>>
+    "resume_offset=OFFSET"       # replace OFFSET via: filefrag -v /swap/swapfile | awk '$1=="0:"{print $4}' <<< INSERT ACTUAL OFFSET >>>
+  ];
+
   system.stateVersion = "24.11";
 
 }
