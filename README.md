@@ -1,6 +1,6 @@
 # Installing NixOS on a surface pro 9 with intel chip, with btrfs and the minegrub theme :)
 
-If you are here then you are either chronically on github or are actually interested in this topic. I only made this since I honestly didnt really find anything related to installing nixos on a surface that helped me (mostly since I really have no clue about NixOS in general i just find it cool(also Im a bit stupid)) anyway. point being I want nixos with btrfs so who do I ask? Someone in a Forum? Oh nah Im scared of people. Of course I ask chatgpt. and what you see here is all what chatgpt managed to do. which I admit didnt work. like at all. It literally crashed everything so sooo many times. (mostly since Im, as mentioned previously, stupid.) Well regardless, lots of tears, annoying chatgpt and yes also a bit of blood( dont ask) laterI got this all here. wether it actually works uh kinda? It kind of does. but I'll try to fix this all a bit. If anyone has smart replies please do so, I dont mind learning a bit. If anyone has questions.. dont come to me, I dont know what this all here does. Ask chatgpt, I guarantee you chatgpt will give you code that crashes you system. Hence my advice. Use NixOS. okay that was all over the place but i think you understand what this is about. Also if you read that all.. uh can I help you? you really read that all? wellp I hope you enjoyed that lol.
+If you are here then you are either chronically on github or are actually interested in this topic. I only made this since I honestly didnt really find anything related to installing nixos on a surface that helped me (mostly since I really have no clue about NixOS in general i just find it cool(also Im a bit stupid)) anyway. point being I want nixos with btrfs so who do I ask? Someone in a Forum? Oh nah Im scared of people. Of course I ask chatgpt. and what you see here is all what chatgpt managed to do. which I admit didnt work. like at all. It literally crashed everything so sooo many times. (mostly since Im, as mentioned previously, stupid.) Well regardless, lots of tears, annoying chatgpt and yes also a bit of blood( dont ask) later, I got this all here. wether it actually works.. uh kinda? It kind of does. but I'll try to fix this all a bit. If anyone has smart replies please do so, I dont mind learning a bit. If anyone has questions.. dont come to me, I dont know what this all here does. Ask chatgpt, I guarantee you chatgpt will give you code that crashes you system. Hence my advice. Use NixOS. okay that was all over the place but i think you understand what this is about. Also if you read that all.. uh can I help you? you really read that all? wellp I hope you enjoyed that lol.
 ---
 
 
@@ -130,7 +130,7 @@ that should install everything necessary. however. uh what I didnt mention is th
 Right back on topic. actually with that you didnt update the system. get trolled :) Basically thats defined by the flake.lock file you copied. thats updated with:
 ```bash
 
-sudo update flake
+sudo nix flake update
 ```
 
  at least I think. also in order for it to work you'll need to be in the /etc/nixos directory. anyway. that will update everything and then you'll need to run the previous rebuild command.
@@ -171,13 +171,13 @@ yeah you may do that all. As you can see homemanager is included and you may che
 minegrub-theme.url = "github:Lxtharia/minegrub-theme";
 ```
 
-## Include Modules
+# Include Modules
 
 ```nix
 minegrub-theme.nixosModules.default
 ```
 
-## GRUB Configuration in `configuration.nix`
+# GRUB Configuration in `configuration.nix`
 
 ```nix
 boot.loader.grub = {
@@ -206,19 +206,21 @@ boot.loader.grub = {
 if you want to use all these extra menuentries you may, but remember to change the boot options count( naturally you can also change the background with ease, I just like that one) Also the chainloading can be changed however you want it to be. I simply have garudalinux on my surface too so thats what it is for me. btw I dont use the osprober since nixos doesnt detect garuda and garuda doesnt detect nixos. No idea why. Im too lazy to fix it and the chainloading thing is actually pretty cool. So I'll stick with that. Obviously you dont have to and can easily change that. How you may ask? No idea. Ask Chatgpt.
 ---
 
- Troubleshooting & Recovery ( you dont want to know how many hours I spent on troubleshooting and stuff. Well actually not many, most of the time was either spent trying to make chatgpt understand whats going on or crying.)
+Troubleshooting & Recovery ( you dont want to know how many hours I spent on troubleshooting and stuff. Well actually not many, most of the time was either spent trying to make chatgpt understand whats going on or crying.)
 
 Follow live USB recovery steps and mount as above. Use `nixos-enter` if needed.
+
 yeah if anything goes wrong just got into a live environment.and obv you'll need to do nixos enter. and just as it said the mounting steps from above. simply follow them. but remember to check the correcnt names of the partitions with lsblk or lsblk -f if you are cool.
 ---
 
-#Snapshots & Maintenance (snapshots are cool. thats my comment here. Another thing would be that I have no idea why chatgpt put that here or what its meant to tell me.)
+Snapshots & Maintenance (snapshots are cool. thats my comment here. Another thing would be that I have no idea why chatgpt put that here or what its meant to tell me.)
 
 Use **Btrfs Assistant** or `btrfs` CLI for snapshots under `/mnt/.snapshots`.
+
 anyway. if you want snapshots working just open the btrfs assistant and voila it'll work. hopefully. well if you have my configuration that is. snapper should be correctly configured. Also I know snapshotting( is that even a word) the root partition isnt smart and wont really work. since nixos. But I still have it included. Because funny. So deal with it. Or delete it. Whatever.
 ---
 
-## TL;DR No Idea why and what thats for. So I'll leave it here and make a very stupid comment. Nice.
+ TL;DR No Idea why and what thats for. So I'll leave it here and make a very stupid comment. Nice.
 
 1. Format & mount Btrfs subvolumes (including `swap` subvolume).
 2. Generate config but **delay** `nixos-install` until swapfile is in place.
@@ -226,3 +228,7 @@ anyway. if you want snapshots working just open the btrfs assistant and voila it
 4. Add `swapDevices` and `boot.kernelParams` to `configuration.nix`.
 5. Run `nixos-install` and enjoy Hibernate on your Surface Pro 9.
 6. Add Minegrub for a fancy GRUB theme.
+
+Well thanks for reading all of that (if you actually read it all, which honestly I cant blame you if you didnt read it since its a lot of MumboJumbo, ha get it MumboJumbo, if you get it I like you) 
+also I really hope that this could help a bit and if you have anything to share then feel free to do so. as Ive mentioned when Im not lazy( which is 50% of the time.. lets not talk about the other 50%...) then I definitly want to learn whatever I can. 
+Anyway, good luck with everything on your end dear reader and in case no one told you today, you are amazing and you matter, at the very least you matter to me since you read this all. and even if you didnt you still matter.
