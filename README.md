@@ -15,7 +15,7 @@ mkfs.btrfs /dev/nvmeXn1pY  # Seriously remeber to change the X and the Y. Also t
 ```
 
 ### Create Btrfs Subvolumes( or just use ext4 but at that point just use the installer srsly. I'll be so mad when the installer adds the option to use btrfs..)
-# Temporarily mount root partition( no idea what this all is, either take it as such or ask chatgpt, also make sure ALL the X's and Y's are replace with their ACTUAL numbers)) Also I really recommend doing this after running sudo -i sin>
+ Temporarily mount root partition( no idea what this all is, either take it as such or ask chatgpt, also make sure ALL the X's and Y's are replace with their ACTUAL numbers)) Also I really recommend doing this after running sudo -i since Chatgpt didnt add sudo infront and I really cant be bothered to do so. Sorry.. well anyway. deal with it Ig.
 
 ```bash
 mount -o compress=zstd /dev/nvmeXn1pY /mnt
@@ -57,9 +57,9 @@ mount /dev/nvmeXn1p1 /mnt/boot/efi
 
 ---
 
-## Initial Installation & Swapfile Setup (yeah imma be honest, the swap thing probably doesnt work since I configured that incorrectly. No idea how to do it correctly tho. If anyone has tips lemme know. I'll fix it then. maybe. Im lazy. living without swap should be possible..)
+# Initial Installation & Swapfile Setup (yeah imma be honest, the swap thing probably doesnt work since I configured that incorrectly. No idea how to do it correctly tho. If anyone has tips lemme know. I'll fix it then. maybe. Im lazy. living without swap should be possible..)
 
-# Generate NixOS configuration files. right important here to note is that the config is the very basic nixos config. So I made another one which you'll find in the Barebones Directory. you can just copy that over there. also read the n>
+ Generate NixOS configuration files. right important here to note is that the config is the very basic nixos config. So I made another one which you'll find in the Barebones Directory. you can just copy that over there. also read the comments there. if you want to obviously. tho dont come crying to me later after not reading it...
 
 ```bash
  nixos-generate-config --root /mnt
@@ -67,7 +67,7 @@ mount /dev/nvmeXn1p1 /mnt/boot/efi
 
 > **Note**: Do **not** run `nixos-install` yet; first set up the swapfile. No Idea why chatgpt put that here, but Imma just keep it lol
 
-# Create the swapfile (12 GiB) using Btrfs tool ( depends on what you have as RAM, mine has 12gb, which every surface pro 9 has.. so iots kinda irrelevant to mention.. but uh yeah. wanted to say something :}) you might need to add somet>
+# Create the swapfile (12 GiB) using Btrfs tool ( depends on what you have as RAM, mine has 12gb, which every surface pro 9 has.. so its kinda irrelevant to mention.. but uh yeah. wanted to say something :}) 
 
 ```bash
 cd /mnt/swap
