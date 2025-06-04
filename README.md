@@ -117,7 +117,7 @@ sudo nixos-install
 
 ---
 
-## Post-Installation
+# Post-Installation
 
 # Ensure system is up-to-date
 sudo nixos-rebuild switch --upgrade yeah honestly dont do it like that ( I know I could delete it but nah, instead what you wanna do now is to copy everything from the NixOSFinale directory into /etc/nixos/. and then you wanna do this:
@@ -171,13 +171,13 @@ yeah you may do that all. As you can see homemanager is included and you may che
 minegrub-theme.url = "github:Lxtharia/minegrub-theme";
 ```
 
-### Include Modules
+## Include Modules
 
 ```nix
 minegrub-theme.nixosModules.default
 ```
 
-### GRUB Configuration in `configuration.nix`
+## GRUB Configuration in `configuration.nix`
 
 ```nix
 boot.loader.grub = {
@@ -206,13 +206,13 @@ boot.loader.grub = {
 if you want to use all these extra menuentries you may, but remember to change the boot options count( naturally you can also change the background with ease, I just like that one) Also the chainloading can be changed however you want it to be. I simply have garudalinux on my surface too so thats what it is for me. btw I dont use the osprober since nixos doesnt detect garuda and garuda doesnt detect nixos. No idea why. Im too lazy to fix it and the chainloading thing is actually pretty cool. So I'll stick with that. Obviously you dont have to and can easily change that. How you may ask? No idea. Ask Chatgpt.
 ---
 
-## Troubleshooting & Recovery ( you dont want to know how many hours I spent on troubleshooting and stuff. Well actually not many, most of the time was either spent trying to make chatgpt understand whats going on or crying.)
+ Troubleshooting & Recovery ( you dont want to know how many hours I spent on troubleshooting and stuff. Well actually not many, most of the time was either spent trying to make chatgpt understand whats going on or crying.)
 
 Follow live USB recovery steps and mount as above. Use `nixos-enter` if needed.
 yeah if anything goes wrong just got into a live environment.and obv you'll need to do nixos enter. and just as it said the mounting steps from above. simply follow them. but remember to check the correcnt names of the partitions with lsblk or lsblk -f if you are cool.
 ---
 
-##Snapshots & Maintenance (snapshots are cool. thats my comment here. Another thing would be that I have no idea why chatgpt put that here or what its meant to tell me.)
+#Snapshots & Maintenance (snapshots are cool. thats my comment here. Another thing would be that I have no idea why chatgpt put that here or what its meant to tell me.)
 
 Use **Btrfs Assistant** or `btrfs` CLI for snapshots under `/mnt/.snapshots`.
 anyway. if you want snapshots working just open the btrfs assistant and voila it'll work. hopefully. well if you have my configuration that is. snapper should be correctly configured. Also I know snapshotting( is that even a word) the root partition isnt smart and wont really work. since nixos. But I still have it included. Because funny. So deal with it. Or delete it. Whatever.
