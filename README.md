@@ -57,7 +57,7 @@ mount /dev/nvmeXn1p1 /mnt/boot/efi
 
 ---
 
-# Initial Installation & Swapfile Setup (yeah imma be honest, the swap thing probably doesnt work since I configured that incorrectly. No idea how to do it correctly tho. If anyone has tips lemme know. I'll fix it then. maybe. Im lazy. living without swap should be possible..)
+ Initial Installation & Swapfile Setup (yeah imma be honest, the swap thing probably doesnt work since I configured that incorrectly. No idea how to do it correctly tho. If anyone has tips lemme know. I'll fix it then. maybe. Im lazy. living without swap should be possible..)
 
  Generate NixOS configuration files. right important here to note is that the config is the very basic nixos config. So I made another one which you'll find in the Barebones Directory. you can just copy that over there. also read the comments there. if you want to obviously. tho dont come crying to me later after not reading it...
 
@@ -67,7 +67,7 @@ mount /dev/nvmeXn1p1 /mnt/boot/efi
 
 > **Note**: Do **not** run `nixos-install` yet; first set up the swapfile. No Idea why chatgpt put that here, but Imma just keep it lol
 
-# Create the swapfile (12 GiB) using Btrfs tool ( depends on what you have as RAM, mine has 12gb, which every surface pro 9 has.. so its kinda irrelevant to mention.. but uh yeah. wanted to say something :}) 
+ Create the swapfile (12 GiB) using Btrfs tool ( depends on what you have as RAM, mine has 12gb, which every surface pro 9 has.. so its kinda irrelevant to mention.. but uh yeah. wanted to say something :}) 
 
 ```bash
 cd /mnt/swap
@@ -82,7 +82,7 @@ swapoff swapfile
 
 ---
 
-##Configure Swap in `configuration.nix` (yeah i kinda already did that in the barebones config, but you need to tweak something yourself so I will keep this whole section here. Dooont worry I'll show you what todo. well chatgpt will tell me and then I'll tell you. Just worse and with many grammatical error. English isnt my first language so please be nice)
+Configure Swap in `configuration.nix` (yeah i kinda already did that in the barebones config, but you need to tweak something yourself so I will keep this whole section here. Dooont worry I'll show you what todo. well chatgpt will tell me and then I'll tell you. Just worse and with many grammatical error. English isnt my first language so please be nice)
 
 Edit `/mnt/etc/nixos/configuration.nix` (or your flake-based config, you dont have a flake based config... yet) and add:
 
@@ -112,7 +112,7 @@ After saving, run: ( yeah just do as it says here. If something doesnt work then
 ```bash
 sudo nixos-install
 ```
-# assuming that you wont have errors you'll need to put in a root password at the end. Remember to check your keyboard layout. I use the german keyboard layout, so had quite a lot of issues there as you might be able to imagine... and a>
+ assuming that you wont have errors you'll need to put in a root password at the end. Remember to check your keyboard layout. I use the german keyboard layout, so had quite a lot of issues there as you might be able to imagine... obviosuly you can change that all if you want. No idea how tho. ask chatgpt.
 
 
 ---
@@ -120,7 +120,7 @@ sudo nixos-install
 ## Post-Installation
 
 # Ensure system is up-to-date
-#sudo nixos-rebuild switch --upgrade yeah honestly dont do it like that ( I know I could delete it but nah, instead what you wanna do now is to copy everything from the NixOSFinale directory into /etc/nixos/. and then you wanna do this:
+sudo nixos-rebuild switch --upgrade yeah honestly dont do it like that ( I know I could delete it but nah, instead what you wanna do now is to copy everything from the NixOSFinale directory into /etc/nixos/. and then you wanna do this:
 
 ```bash
 sudo nixos-rebuild switch --flake /etc/nixos#nixos 
@@ -163,9 +163,9 @@ yeah you may do that all. As you can see homemanager is included and you may che
 
 ---
 
-## GRUB & Minegrub Theme ( If you dont like minegrub then.. f u. No Im kidding. its personal taste so its cool. Just change it to whatever you want. If you dont know how todo that. Dont ask me. I dont know either. ask chatgpt. my advice there would be to look up the theme you want on the internet and then to see wether they have a flakes integration. and then you mayb copy that and the flake.nix files into chatgpt and tell it to merge them. chatgpt will never really find anything helpful if you let it search.)
+ GRUB & Minegrub Theme ( If you dont like minegrub then.. f u. No Im kidding. its personal taste so its cool. Just change it to whatever you want. If you dont know how todo that. Dont ask me. I dont know either. ask chatgpt. my advice there would be to look up the theme you want on the internet and then to see wether they have a flakes integration. and then you mayb copy that and the flake.nix files into chatgpt and tell it to merge them. chatgpt will never really find anything helpful if you let it search.)
 
-### Flake Inputs for Minegrub ( yeah u may ignore that too since its all already in the flake you copied. I just kept it here because there are a few things that arent in my flake, you'll see. Just keep on reading.)
+ Flake Inputs for Minegrub ( yeah u may ignore that too since its all already in the flake you copied. I just kept it here because there are a few things that arent in my flake, you'll see. Just keep on reading.)
 
 ```nix
 minegrub-theme.url = "github:Lxtharia/minegrub-theme";
