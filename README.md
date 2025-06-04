@@ -15,9 +15,9 @@ mkfs.btrfs /dev/nvmeXn1pY  # Seriously remeber to change the X and the Y. Also t
 ```
 
 ### Create Btrfs Subvolumes( or just use ext4 but at that point just use the installer srsly. I'll be so mad when the installer adds the option to use btrfs..)
+# Temporarily mount root partition( no idea what this all is, either take it as such or ask chatgpt, also make sure ALL the X's and Y's are replace with their ACTUAL numbers)) Also I really recommend doing this after running sudo -i sin>
 
 ```bash
-# Temporarily mount root partition( no idea what this all is, either take it as such or ask chatgpt, also make sure ALL the X's and Y's are replace with their ACTUAL numbers)) Also I really recommend doing this after running sudo -i since always typing sudo in front is kinda annoying.. I could have also added sudo infront.. but chatgpt didnt. and I just copy what chatgpt gives me. so deal with it. 
 mount -o compress=zstd /dev/nvmeXn1pY /mnt
 
 # Create subvolumes
@@ -59,15 +59,17 @@ mount /dev/nvmeXn1p1 /mnt/boot/efi
 
 ## Initial Installation & Swapfile Setup (yeah imma be honest, the swap thing probably doesnt work since I configured that incorrectly. No idea how to do it correctly tho. If anyone has tips lemme know. I'll fix it then. maybe. Im lazy. living without swap should be possible..)
 
+# Generate NixOS configuration files. right important here to note is that the config is the very basic nixos config. So I made another one which you'll find in the Barebones Directory. you can just copy that over there. also read the n>
+
 ```bash
-# Generate NixOS configuration files. right important here to note is that the config is the very basic nixos config. So I made another one which you'll find in the Barebones Directory. you can just copy that over there. also read the note in the Barebones Directory. Or dont. but dont come crying to me later... I promise there will only be very sophisticated things written there. okay maybe not. but anyway. also you can regenerate the hardware config easily by running the command again, it doesnt overwrite the config. I think. just try it)
  nixos-generate-config --root /mnt
 ```
 
 > **Note**: Do **not** run `nixos-install` yet; first set up the swapfile. No Idea why chatgpt put that here, but Imma just keep it lol
 
+# Create the swapfile (12 GiB) using Btrfs tool ( depends on what you have as RAM, mine has 12gb, which every surface pro 9 has.. so iots kinda irrelevant to mention.. but uh yeah. wanted to say something :}) you might need to add somet>
+
 ```bash
-# Create the swapfile (12 GiB) using Btrfs tool ( depends on what you have as RAM, mine has 12gb, which every surface pro 9 has.. so iots kinda irrelevant to mention.. but uh yeah. wanted to say something :}) you might need to add something else here btw. chatgpt said something along the lines of this command: btrfs property set /mnt/swap/swapfile compression none, though that doesnt work. so i am now confused and left it out. so yeah. Good Luck I guess. (to me as much as to you dear reader)
 cd /mnt/swap
 btrfs filesystem mkswapfile --size 12G --uuid clear swapfile
 chmod 600 swapfile
@@ -109,22 +111,31 @@ After saving, run: ( yeah just do as it says here. If something doesnt work then
 
 ```bash
 sudo nixos-install
-# assuming that you wont have errors you'll need to put in a root password at the end. Remember to check your keyboard layout. I use the german keyboard layout, so had quite a lot of issues there as you might be able to imagine... and after that you may reboot. also I oftentimes had the issue that grub didnt manage to install itself correctly. the fixes should be included tho if that happens to you.. then. uh. good luck soldier!
 ```
+# assuming that you wont have errors you'll need to put in a root password at the end. Remember to check your keyboard layout. I use the german keyboard layout, so had quite a lot of issues there as you might be able to imagine... and a>
+
 
 ---
 
 ## Post-Installation
 
-```bash
 # Ensure system is up-to-date
 #sudo nixos-rebuild switch --upgrade yeah honestly dont do it like that ( I know I could delete it but nah, instead what you wanna do now is to copy everything from the NixOSFinale directory into /etc/nixos/. and then you wanna do this:
+
+```bash
 sudo nixos-rebuild switch --flake /etc/nixos#nixos 
-# that should install everything necessary. however. uh what I didnt mention is that that will take.. like prob 2-3 hours? Make sure you have lots of time and a really good internet connection. also uh check your power. the surface really discharges fast. In general I have no idea how well the battery life is. Another issue is that it will get hot. like very hot. especially when connected to the charger. but what can you do. just sit it out.) my surface is really screaming rn... 
-#Right back on topic. actually with that you didnt update the system. get trolled :) Basically thats defined by the flake.lock file you copied. thats updated with:
-sudo update flake
-# at least I think. also in order for it to work you'll need to be in the /etc/nixos directory. anyway. that will update everything and then you'll need to run the previous rebuild command.
 ```
+that should install everything necessary. however. uh what I didnt mention is that that will take.. like prob 2-3 hours? Make sure you have lots of time and a really good internet connection. also uh check your power. the surface real>
+
+Right back on topic. actually with that you didnt update the system. get trolled :) Basically thats defined by the flake.lock file you copied. thats updated with:
+```bash
+
+sudo update flake
+```
+
+ at least I think. also in order for it to work you'll need to be in the /etc/nixos directory. anyway. that will update everything and then you'll need to run the previous rebuild command.
+
+
 Enable flakes support if not yet enabled: ( yeah no need to worry about that thats all already included. Chatgpt just added it here and I ddint want to delete it.
 
 ```nix
@@ -146,8 +157,9 @@ sudo cp -r nixossurface9/* /etc/nixos/
 
 sudo nixos-rebuild switch --flake /etc/nixos#nixos
 home-manager switch --flake /etc/nixos#phil 
-#yeah you may do that all. As you can see homemanager is included and you may check the home.nix file and change it however you want. Dont go complaining to me with anything there. I dont know whats going on there either. Also I added aliases into home.nix so all the commands are easier to do. just check home.nix. (and yes I actually did that not chatgpt, crazy I know.)
 ```
+
+yeah you may do that all. As you can see homemanager is included and you may check the home.nix file and change it however you want. Dont go complaining to me with anything there. I dont know whats going on there either. Also I added aliases into home.nix so all the commands are easier to do. just check home.nix. (and yes I actually did that not chatgpt, crazy I know.)
 
 ---
 
