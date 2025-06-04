@@ -122,8 +122,8 @@
 
   # Hibernate (Suspend-to-Disk) support <<< MARKED CHANGE >>>
   boot.kernelParams = [
-    "resume=/swap/swapfile";     # adjust path if needed <<< REVIEW PATH >>>
-    "resume_offset=OFFSET"       # replace OFFSET via: filefrag -v /swap/swapfile | awk '$1=="0:"{print $4}' <<< INSERT ACTUAL OFFSET >>>
+    "resume=/swap/swapfile"     # adjust path if needed <<< REVIEW PATH >>>
+    "resume_offset=269568"       # replace OFFSET via: filefrag -v /swap/swapfile | awk '$1=="0:"{print $4}' <<< INSERT ACTUAL OFFSET >>>
   ];
 
   system.stateVersion = "24.11";
