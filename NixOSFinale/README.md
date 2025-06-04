@@ -4,7 +4,64 @@ Think about it, the arms of the chair, are actually just chairs for your arms.
 Anyway enough from me, dont read this.. seriously its not worth it.
 
 
+																																																																																																										
+															
+																	
+															
+												
+											
+												
+														
+																	
+													
+																		
+																									
+										
+											
+													
+													
+									
+																	
+																
+	
+	
+	
+	
+	
+	
+	
+	
+																		
 
+		
+						
+						
+				
+				
+				
+				
+					
+									
+										
+			
+				
+					
+										
+							
+					
+	
+						
+	
+	
+		
+				
+	
+	
+			
+	
+				
+	
+	
 
 
 
