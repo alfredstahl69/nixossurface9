@@ -3,7 +3,7 @@
 {
   environment.systemPackages = with pkgs; [
     kdePackages.plasma-browser-integration
-    firedragon
+#    firedragon
     libreoffice
     powertop 
     file lsof psmisc usbutils 

@@ -13,11 +13,20 @@
   boot.loader.grub.devices = [ "nodev" ];
   boot.loader.grub.useOSProber = false;
 
+  boot.loader.grub.extraEntries = ''
+    menuentry "Boot Garuda" {
+      insmod part_gpt
+      insmod fat
+      search --fs-uuid 6C69-6009 --set=root
+      chainloader /EFI/Garuda/grubx64.efi
+    }
+  '';
+
   boot.loader.grub.minegrub-theme = {
     enable = true;
     splash = "100% Flakes!";
     background = "background_options/1.20 - [Trails & Tales].png";
-    boot-options-count = 2;
+    boot-options-count = 3;
   };
 
   boot.loader.efi.efiSysMountPoint = "/boot/efi/";
@@ -112,20 +121,7 @@
 
   services.acpid.enable = true;
 
-  # Swapfile definition for 12 GiB (Added for Hibernate) <<< MARKED CHANGE >>>
-  swapDevices = [
-    {
-      device = "/swap/swapfile";  # adjust if your swap subvolume mountpoint differs <<< REVIEW UUID/Path >>>
-      size   = 12288;              # Size in MiB (12 GiB)
-    }
-  ];
-
-  # Hibernate (Suspend-to-Disk) support <<< MARKED CHANGE >>>
-  boot.kernelParams = [
-    "resume=/swap/swapfile"     # adjust path if needed <<< REVIEW PATH >>>
-    "resume_offset=269568"       # replace OFFSET via: filefrag -v /swap/swapfile | awk '$1=="0:"{print $4}' <<< INSERT ACTUAL OFFSET >>>
-  ];
-
+  boot.resumeDevice = "/dev/disk/by-uuid/d65c5f6e-d487-4c7b-9297-ed5638daddaf";
   system.stateVersion = "24.11";
 
 }
