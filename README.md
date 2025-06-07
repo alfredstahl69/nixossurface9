@@ -13,7 +13,7 @@ Use GParted or do it manually: Seriously just use gparted. so much easier. (Also
 ```bash
 mkfs.btrfs /dev/nvmeXn1pY  # Seriously remeber to change the X and the Y. Also tripple check wether the numbers are correct. I once ended up with my windows boot partition in random places. good times. (dont ask how, I dont even know)
 ```
-
+if you want hibernate then you should also create a linux swap file. for hibernate especially you'll need roughly the same as ram. honestly just put in 18000 and it'll prob be fine. you may also change it to less if you want. I recommend doing that all in gparted, much simpler. the file format should be linux swap. but remember you'll need to add it into the config too, when generating the hardweare config nixos will find the swap partition but hibernate wont work just yet. but we'll get to that.
 ### Create Btrfs Subvolumes( or just use ext4 but at that point just use the installer srsly. I'll be so mad when the installer adds the option to use btrfs..)
  Temporarily mount root partition( no idea what this all is, either take it as such or ask chatgpt, also make sure ALL the X's and Y's are replace with their ACTUAL numbers)) Also I really recommend doing this after running sudo -i since Chatgpt didnt add sudo infront and I really cant be bothered to do so. Sorry.. well anyway. deal with it Ig.
 
@@ -27,7 +27,6 @@ btrfs subvolume create /mnt/nix        # Nix store
 btrfs subvolume create /mnt/log        # Log files
 btrfs subvolume create /mnt/cache      # Cache
 btrfs subvolume create /mnt/.snapshots # Snapshots
-btrfs subvolume create /mnt/swap       # Swap subvolume (for swapfile)
 
 # Unmount temporarily
 umount /mnt
@@ -45,10 +44,6 @@ mount -o compress=zstd,subvol=nix        /dev/nvmeXn1pY /mnt/nix
 mount -o compress=zstd,subvol=log        /dev/nvmeXn1pY /mnt/var/log
 mount -o compress=zstd,subvol=cache      /dev/nvmeXn1pY /mnt/var/cache
 mount -o compress=zstd,subvol=.snapshots /dev/nvmeXn1pY /mnt/.snapshots
-
-# Mount swap subvolume WITHOUT CoW (hehe cows. Did you know that Cows are actually really dangerous? pretty scary things..)
-tmp_dir=/mnt/swap
-mount -o subvol=swap,nodatacow,compress=no /dev/nvmeXn1pY $tmp_dir
 
 # Mount EFI partition (yeah the efi directory probably doesnt exist so you'll have to add it. actually lemme just place a command here...)
 mkdir -p /mnt/boot/efi
@@ -69,43 +64,18 @@ mount /dev/nvmeXn1p1 /mnt/boot/efi
 
  Create the swapfile (12 GiB) using Btrfs tool ( depends on what you have as RAM, mine has 12gb, which every surface pro 9 has.. so its kinda irrelevant to mention.. but uh yeah. wanted to say something :}) 
 
-```bash
-cd /mnt/swap
-btrfs filesystem mkswapfile --size 12G --uuid clear swapfile
-chmod 600 swapfile
-
-# Test activating swap( why? no idea. just do it. chatgpt said so, and I do everything an AI tells me to, jk I dont and neither should you)
-swapon swapfile
-swapon --show  # Should display ~12G swap
-swapoff swapfile
-```
-
+oaky before here were a few commands but they didnt really work and I found a better? methode for swap. so you may ignore all the comments here. I just kept them since.. uh fell funny.
 ---
 
 Configure Swap in `configuration.nix` (yeah i kinda already did that in the barebones config, but you need to tweak something yourself so I will keep this whole section here. Dooont worry I'll show you what todo. well chatgpt will tell me and then I'll tell you. Just worse and with many grammatical error. English isnt my first language so please be nice)
 
 Edit `/mnt/etc/nixos/configuration.nix` (or your flake-based config, you dont have a flake based config... yet) and add:
 
-```nix
-{ config, pkgs, ... }:
-{
-  # Swapfile definition
-  swapDevices = [
-    {
-      device = "/swap/swapfile";  # Path inside the mount
-      size   = 12288;              # Size in MiB (12 GiB)
-    }
-  ];
-
-  # Hibernate (Suspend-to-Disk) support
-  boot.kernelParams = [
-    "resume=/swap/swapfile"
-    # Replace OFFSET with the value found via filefrag:
-    # e.g. filefrag -v /swap/swapfile | awk '$1=="0:"{print $4}' (here thats the important part. copy that command and run it. that will give you a random number with three dots at the end. just copy that number without the dots and replace OFFSET with that number. I think thats how its supposed to be at least...)
-    "resume_offset=OFFSET"
-  ];
-}
+so what you'll need to add here is basically just this here: 
+```bash
+boot.resumeDevice = "/dev/disk/by-uuid/d65c5f6e-d487-4c7b-9297-ed5638daddaf";
 ```
+well I already added that. however the long dumb string there. you will need to change that to the actual uuid of your swap partiton. you can find that either with lsblk -f or just in gparted. and then it should work.. remember to change that in the final config too.
 
 After saving, run: ( yeah just do as it says here. If something doesnt work then uh. yeah Ive been there. My hint? give up. No Im just kididng. Never give up. copy the entire error( I know thats not necessary but we want to annoy Sir GPT) and then paste it into chatgpt. With like 10 years worth of luck you'll actually get a helpful answer that doesnt destroy your entire existence. ( honestly if you know whats going on it probably also wont get destroyed.. but I have no idea whats going on. so. yeah. anyways.)
 
@@ -136,20 +106,20 @@ sudo nix flake update
  at least I think. also in order for it to work you'll need to be in the /etc/nixos directory. anyway. that will update everything and then you'll need to run the previous rebuild command.
 
 
-Enable flakes support if not yet enabled: ( yeah no need to worry about that thats all already included. Chatgpt just added it here and I ddint want to delete it.
+Enable flakes support if not yet enabled: ( yeah no need to worry about that thats all already included. Chatgpt just added it here and I didnt want to delete it.
 
 ```nix
 # In /etc/nixos/configuration.nix or flake inputs
 nix.settings.experimental-features = [ "nix-command" "flakes" ];
 ```
 
-Install Git if missing:
+Install Git if missing: or just add it into the environment system packages as it already is... or do nix-shell -p git. which is definitly one of my favorite features in nixos
 
 ```bash
 sudo nix-env -iA nixpkgs.git
 ```
 
-Reclone repo & rebuild:
+Reclone repo & rebuild: no need to reclone. no Idea why sir gpt added that here.
 
 ```bash
 git clone https://github.com/alfredstahl69/nixossurface9

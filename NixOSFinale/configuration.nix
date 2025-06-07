@@ -13,14 +13,14 @@
   boot.loader.grub.devices = [ "nodev" ];
   boot.loader.grub.useOSProber = false;
 
-  boot.loader.grub.extraEntries = ''
-    menuentry "Boot Garuda" {
-      insmod part_gpt
-      insmod fat
-      search --fs-uuid 6C69-6009 --set=root
-      chainloader /EFI/Garuda/grubx64.efi
-    }
-  '';
+#  boot.loader.grub.extraEntries = ''
+#    menuentry "Boot Garuda" {
+#      insmod part_gpt
+#      insmod fat
+#      search --fs-uuid 6C69-6009 --set=root
+#      chainloader /EFI/Garuda/grubx64.efi
+#    }
+#  ''; #this all here is optional and configured for my device. if you want it you need to change it and if not just leave it as it is
 
   boot.loader.grub.minegrub-theme = {
     enable = true;
@@ -31,7 +31,6 @@
 
   boot.loader.efi.efiSysMountPoint = "/boot/efi/";
   boot.loader.grub.configurationName = "NixOS";
-  #boot.loader.grub.efiBootloaderId = "NixOS";
 
   services.snapper.configs."home" = {
     SUBVOLUME = "/home";
@@ -121,7 +120,7 @@
 
   services.acpid.enable = true;
 
-  boot.resumeDevice = "/dev/disk/by-uuid/d65c5f6e-d487-4c7b-9297-ed5638daddaf";
+  boot.resumeDevice = "/dev/disk/by-uuid/d65c5f6e-d487-4c7b-9297-ed5638daddaf"; # again remember to change the uuid here please. else it wont work. if you dont want swap just comment it out here.
   system.stateVersion = "24.11";
 
 }

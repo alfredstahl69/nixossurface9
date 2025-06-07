@@ -88,7 +88,7 @@
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.phil = {
     isNormalUser = true;
-    description = "phil";
+    description = "phil"; #here you should change your name
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
       kdePackages.kate
@@ -135,7 +135,7 @@
   };
   
   services.power-profiles-daemon.enable = true;  
-  boot.resumeDevice = "/dev/disk/by-uuid/d65c5f6e-d487-4c7b-9297-ed5638daddaf";
+  boot.resumeDevice = "/dev/disk/by-uuid/d65c5f6e-d487-4c7b-9297-ed5638daddaf"; #here you will need to put in the actual uuid of your swap partiton.
   # This value determines the NixOS release...
   system.stateVersion = "24.11"; # Did you read the comment?
 
