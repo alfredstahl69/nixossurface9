@@ -3,6 +3,7 @@
 {
   environment.systemPackages = with pkgs; [
     kdePackages.plasma-browser-integration
+    mullvad-browser
     libreoffice
     powertop 
     file lsof psmisc usbutils 

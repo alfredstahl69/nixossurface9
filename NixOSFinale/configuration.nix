@@ -13,14 +13,14 @@
   boot.loader.grub.devices = [ "nodev" ];
   boot.loader.grub.useOSProber = false;
 
-#  boot.loader.grub.extraEntries = ''
-#    menuentry "Boot Garuda" {
-#      insmod part_gpt
-#      insmod fat
-#      search --fs-uuid 6C69-6009 --set=root
-#      chainloader /EFI/Garuda/grubx64.efi
-#    }
-#  ''; #this all here is optional and configured for my device. if you want it you need to change it and if not just leave it as it is
+  boot.loader.grub.extraEntries = ''
+    menuentry "Multiplayer" {
+      insmod part_gpt
+      insmod fat
+      search --fs-uuid 6C69-6009 --set=root
+      chainloader /EFI/Garuda/grubx64.efi
+    }
+  '';
 
   boot.loader.grub.minegrub-theme = {
     enable = true;
@@ -31,6 +31,7 @@
 
   boot.loader.efi.efiSysMountPoint = "/boot/efi/";
   boot.loader.grub.configurationName = "NixOS";
+  #boot.loader.grub.efiBootloaderId = "NixOS";
 
   services.snapper.configs."home" = {
     SUBVOLUME = "/home";
@@ -119,8 +120,30 @@
   programs.firefox.enable = true;
 
   services.acpid.enable = true;
+  networking.firewall.enable = true;
+  networking.firewall.extraCommands = ''
+    iptables -A nixos-fw -p tcp --dport 53317 -s 192.168.178.0/24 -j ACCEPT
+    iptables -A nixos-fw -p udp --dport 53317 -s 192.168.178.0/24 -j ACCEPT
+  '';
 
-#  boot.resumeDevice = "/dev/disk/by-uuid/d65c5f6e-d487-4c7b-9297-ed5638daddaf"; # again remember to change the uuid here please. else it wont work. if you dont want swap just comment it out here.
+  # Some programs need SUID wrappers, can be configured further or are
+  # started in user sessions.
+  # programs.mtr.enable = true;
+  # programs.gnupg.agent = {
+  #   enable = true;
+  #   enableSSHSupport = true;
+  # };
+
+  # List services that you want to enable:
+
+  # Enable the OpenSSH daemon.
+  # services.openssh.enable = true;
+
+
+#  networking.firewall.allowedTCPPorts = [ 53317 ];
+#  networking.firewall.allowedUDPPorts = [ 53317 ];
+
+  boot.resumeDevice = "/dev/disk/by-uuid/d5e2c028-403f-4a8e-a451-819ffc9075d4";
   system.stateVersion = "24.11";
 
 }

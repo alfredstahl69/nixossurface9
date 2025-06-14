@@ -39,8 +39,8 @@
       reload = "home-manager switch --flake /etc/nixos#phil";
       reload-git = "home-manager switch --flake ~/nixossurface9#phil";
       rebuild = "sudo nixos-rebuild switch --flake /etc/nixos#nixos && home-manager switch --flake /etc/nixos#phil";
-      rebuild-git = "sudo nixos-rebuild switch --flake ~/nixossurface9#nixos && home-manager switch --flake ~/nixossurface9#phil";
-      dry-rebuild-git = "sudo nixos-rebuild dry-run --flake ~/nixossurface9#nixos";
+      rebuild-boot = "sudo nixos-rebuild boot --flake /etc/nixos#nixos";
+      ls-gen = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
       dry-rebuild = "sudo nixos-rebuild dry-run --flake /etc/nixos#nixos";
       update-flake-git = "sudo nixos-rebuild switch --flake ~/nixossurface9#nixos";
       update-flake = "sudo nixos-rebuild switch --flake /etc/nixos#nixos";
