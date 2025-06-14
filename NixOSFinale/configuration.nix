@@ -120,7 +120,7 @@
 
   services.acpid.enable = true;
 
-  boot.resumeDevice = "/dev/disk/by-uuid/d65c5f6e-d487-4c7b-9297-ed5638daddaf"; # again remember to change the uuid here please. else it wont work. if you dont want swap just comment it out here.
+#  boot.resumeDevice = "/dev/disk/by-uuid/d65c5f6e-d487-4c7b-9297-ed5638daddaf"; # again remember to change the uuid here please. else it wont work. if you dont want swap just comment it out here.
   system.stateVersion = "24.11";
 
 }

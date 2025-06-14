@@ -17,7 +17,7 @@
     syntaxHighlighting.enable = true;
 
     # ✅ Improve Zsh experience
-    initExtra = ''
+    initContent = ''
       # Load Powerlevel10k (if installed)
       [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 

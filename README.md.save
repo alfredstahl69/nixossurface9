@@ -89,12 +89,11 @@ sudo nixos-install
 
 # Post-Installation
 
-Now you'll have to set the password for your user account. remember you only set the one for your root account. now set it after you booted into nixos and are in the login screen, you'll need to press ctrl + alt + f3 and then type:
+Now when you booted into it and hopefully everything worked... you need to set a password for your account first. Remember you only set a password for root, not your user. Now in order to do that you'll need to press ctrl + alt + f3 and then enter root, press enter and then type in the password you just set for root. Now we set a password:
 ```bash
-passwd phil #or whatever name you set
+passwd phil #or whatever name you picked
 ```
-and then enter your desired password. after that you may exit by pressing ctrl + alt +f7 and then you can log in
-
+and then type the word. exit it by ctrl + alt +f8
 # Ensure system is up-to-date
 sudo nixos-rebuild switch --upgrade yeah honestly dont do it like that ( I know I could delete it but nah, instead what you wanna do now is to copy everything from the NixOSFinale directory into /etc/nixos/. and then you wanna do this:
 
